@@ -11,17 +11,19 @@ public class Notification {
 	//type would either be inventory_level or job alert
 	private String user;
 	private String id;
-	private String notificationInfo;
+	private String notificationInfo = "";
 	private static int num;
-	private String job = "";
-	private String inv = "";
-	private int inv_num;
+	private String job;
+	private String inv;
+	private int inv_level = 0;
 	
 	public Notification(String username, String type, String job_number) {
 		this.type = type;
 		user = username;
 		id = "AMB-J"+Notification.num++;
 		this.job = job_number;
+		this.inv = "?";
+		this.inv_level = 0;
 	}
 	
 	public Notification(String username, String inventory_item, int count) {
@@ -29,7 +31,8 @@ public class Notification {
 		user = username;
 		id = "AMB-I"+Notification.num++;
 		this.inv = inventory_item;
-		inv_num = count;
+		inv_level = count;
+		this.job = "?";
 	}
 	
 	public String getUser(){
@@ -44,12 +47,24 @@ public class Notification {
 		return id;
 	}
 	
+	public String getJob() {
+		return job;
+	}
+
+	public String getInv() {
+		return inv;
+	}
+
+	public int getInv_level() {
+		return inv_level;
+	}
+	
 	private void jobNotify(){
 		this.notificationInfo = String.format("New Job (Job #: %s) assigned", this.job);
 	}
 	
 	private void inventoryNotify(){
-		this.notificationInfo = String.format("%s levels are low (%s)", inv,inv_num);
+		this.notificationInfo = String.format("%s levels are low (%s)", inv,inv_level);
 	}
 	
 	public String alert(){

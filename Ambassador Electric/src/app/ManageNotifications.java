@@ -61,5 +61,6 @@ public interface ManageNotifications {
 	 * returns an ArrayList of all notification objects in the database
 	 */
 	
+	//url = jdbc:oracle:thin:@localhost:3306:xe
 
 }
