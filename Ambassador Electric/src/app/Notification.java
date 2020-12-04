@@ -1,10 +1,7 @@
 package app;
 
-import database.DatabasesDAO;
-import org.springframework.context.ApplicationContext;  
-import org.springframework.context.support.ClassPathXmlApplicationContext; 
-
 /**
+ * Notification object created from this class
  * @author Marlon Lewis
  * @version 1.0
  */
@@ -14,14 +11,24 @@ public class Notification {
 	private String type;
 	//type would either be inventory_level or job alert
 	private String user;
-	private String id;
+	private int id = 0;
 	private String notificationInfo = "";
-	private static int num;
 	private String job;
 	private String inv;
 	private int inv_level = 0;
 	
-	public Notification(String type, String user, String id, String message, String job, String item, int item_level){
+	//Constructor 1
+	/**
+	 * CReates a notification object, used specifically when retrieving database notification to be presented to user/system
+	 * @param type
+	 * @param user
+	 * @param id
+	 * @param message
+	 * @param job
+	 * @param item
+	 * @param item_level
+	 */
+	public Notification(String type, String user, int id, String message, String job, String item, int item_level){
 		this.type = type;
 		this.user = user;
 		this.id = id;
@@ -31,56 +38,103 @@ public class Notification {
 		inv_level = item_level;
 	}
 	
-	public Notification(String username, String type, String job_number) {
-		this.type = type;
+	//Constructor 2
+	/**
+	 * Creates a job notification object
+	 * @param username employee's username from the database
+	 * @param job_number identification of specific job
+	 */
+	public Notification(String username, String job_number) {
+		this.type = "job";
 		user = username;
-		id = "AMB-J"+Notification.num++;
+		//id = "AMB-J"+Notification.num++;
 		this.job = job_number;
 		this.inv = "?";
 		this.inv_level = 0;
 	}
 	
+	//Constructor 3
+	/**
+	 * Creates an inventory notification object when item is within critical
+	 * @param username employee's username from the database
+	 * @param inventory_item name of inventory item
+	 * @param count current level of the inventory item specified
+	 */
 	public Notification(String username, String inventory_item, int count) {
 		this.type = "inventory_level";
 		user = username;
-		id = "AMB-I"+Notification.num++;
+		//id = "AMB-I"+Notification.num++;
 		this.inv = inventory_item;
 		inv_level = count;
 		this.job = "?";
 	}
 	
+	/**
+	 * Used to get the user attribute from the notification
+	 * @return username: String
+	 */
 	public String getUser(){
 		return user;
 	}
 	
+	/**
+	 * Used to get the type attribute from the notification
+	 * @return type: String
+	 */
 	public String getType(){
 		return type;
 	}
 	
-	public String getId(){
+	/**
+	 * Used to get the id attribute for the notification
+	 * @return id: String
+	 */
+	public int getId(){
 		return id;
 	}
 	
+	/**
+	 * Used to get the job number attribute from the notification
+	 * @return job: String
+	 */
 	public String getJob() {
 		return job;
 	}
 
+	/**
+	 * Used to get the inventory item attribute from the notification
+	 * @return inv: String
+	 */
 	public String getInv() {
 		return inv;
 	}
 
+	/**
+	 * Used to get the count for the specific inventory item from the notification
+	 * @return
+	 */
 	public int getInv_level() {
 		return inv_level;
 	}
 	
+	/**
+	 * Used to create a String message for a job notification (alert)
+	 */
 	private void jobNotify(){
 		this.notificationInfo = String.format("New Job (Job #: %s) assigned", this.job);
 	}
 	
+	/**
+	 * Used to create a String message for an inventory notification (alert)
+	 */
 	private void inventoryNotify(){
 		this.notificationInfo = String.format("%s levels are low (%s)", inv,inv_level);
 	}
 	
+	/**
+	 * Used to print out the alert message for the notification object
+	 * @return notificationInfo: String
+	 */
 	public String alert(){
 		if (this.type=="inventory_level"){
 			inventoryNotify();
@@ -89,51 +143,6 @@ public class Notification {
 			jobNotify();
 		}
 		return this.notificationInfo;
-	}
-	
-	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-		try{
-			ApplicationContext ctx = new ClassPathXmlApplicationContext("applicationContext.xml");
-			
-			DatabasesDAO dao =(DatabasesDAO)ctx.getBean("dbdao"); 
-			
-			Notification xxx = new Notification("marlon", "laptop", 6);
-			System.out.println(xxx.getUser());
-			System.out.println(xxx.getId());
-			System.out.println(xxx.getType());
-			System.out.println(xxx.alert());
-			
-			Notification yyy = new Notification("lewis", "phone", 2);
-			System.out.println(yyy.getUser());
-			System.out.println(yyy.getId());
-			System.out.println(yyy.getType());
-			System.out.println(yyy.alert());
-			
-			Notification aaa = new Notification("mlewis", "job", "JB101");
-			System.out.println(aaa.getUser());
-			System.out.println(aaa.getId());
-			System.out.println(aaa.getType());
-			System.out.println(aaa.alert());	
-			
-			Notification bbb = new Notification("user", "job", "JB102");
-			System.out.println(bbb.getUser());
-			System.out.println(bbb.getId());
-			System.out.println(bbb.getType());
-			System.out.println(bbb.alert());	
-			int status = dao.saveNotification(xxx);
-			
-			System.out.println(status);
-		}
-		catch(Exception e){
-			e.printStackTrace();
-			for (String s: e.getMessage().split(":")){
-				System.out.println(s+":");
-			}
-			
-		}
-		
-
 	}
 
 }

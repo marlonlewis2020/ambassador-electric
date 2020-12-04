@@ -21,18 +21,25 @@ public class DatabasesDAO{
 	//
 	
 	public int saveItem(InventoryItem item){
-		String query="insert into Inventory values('"+item.getProductCode()+"','"
-	+item.getItemName()+"','"+item.getTotalQty()+"','"+item.getTotalQty()+"','"+item.getJobs()
+		String query="insert into Inventory values(DEFAULT,'"+item.getProductCode()+"','"
+	+item.getItemName()+"','"+item.getTotalQty()+"','"+item.getJobs()
 	+"','"+item.getAssignedQty()+"','"+item.getpendingQty()+"','"+item.getUnitCost()
 	+"','"+item.getTotalCost()+"','"+item.getCriticalLevel()+"','"+item.isCritical()
 	+"','"+item.getSupplier()+"','"+item.getManufacturer()+"')";
 		return jdbcTemplate.update(query);
 	}
 	
-	public int updateItem(InventoryItem item, int num){
+	public int updateItem(InventoryItem item, String column, String value){
+		
 		String prod_code = item.getProductCode();
-		String query="UPDATE 'Inventory' SET 'Total Quantity'="+num+" WHERE 'Product Code'="+prod_code;
-		return jdbcTemplate.update(query);
+		try{
+			String query="UPDATE `Inventory` SET `"+column+"`='"+Integer.valueOf(value)+"' WHERE `Product Code`='"+prod_code+"'";
+			return jdbcTemplate.update(query);
+		}
+		catch(NumberFormatException n){
+			String query="UPDATE `Inventory` SET `"+column+"`='"+value+"' WHERE `Product Code`='"+prod_code+"'";
+			return jdbcTemplate.update(query);
+		}
 	}
 	
 	public List<InventoryItem> allInventory(String filter, String criteria){
@@ -75,7 +82,7 @@ public class DatabasesDAO{
 		// TODO Auto-generated method stub
 	    String sql = String.format("SELECT * FROM 'NOTIFICATIONS' WHERE '%s' = ?",column);
 	    return jdbcTemplate.queryForObject(sql, new Object[]{value}, (rs, rowNum) ->
-        new Notification(rs.getString("TYPE"), rs.getString("USER"), rs.getString("ID"), 
+        new Notification(rs.getString("TYPE"), rs.getString("USER"), rs.getInt("ID"), 
         		rs.getString("NOTIFICATION"), rs.getString("JOB"), rs.getString("ITEM"), 
         		rs.getInt("INV_LEVEL")));
 	}
@@ -83,7 +90,7 @@ public class DatabasesDAO{
 	public List<Notification> allNotifications(){
 		String sql = "select * from 'Notifications'";
 		return jdbcTemplate.query(sql, (rs, rowNum) ->
-        new Notification(rs.getString("TYPE"), rs.getString("USER"), rs.getString("ID"), 
+        new Notification(rs.getString("TYPE"), rs.getString("USER"), rs.getInt("ID"), 
         		rs.getString("NOTIFICATION"), rs.getString("JOB"), rs.getString("ITEM"), 
         		rs.getInt("INV_LEVEL")));
 	}

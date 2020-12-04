@@ -11,5 +11,6 @@
 	<classpathentry kind="lib" path="C:/Users/Marlon Lewis/Downloads/commons-logging-1.1.2.jar/commons-logging-1.1.2.jar"/>
 	<classpathentry kind="lib" path="C:/Users/Marlon Lewis/Downloads/org.springframework.asm-3.0.1.release.jar/org.springframework.asm-3.0.1.RELEASE.jar"/>
 	<classpathentry kind="lib" path="C:/Users/Marlon Lewis/Downloads/springjars/springjars/core/core/org.springframework.expression-3.0.1.RELEASE-A.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Marlon Lewis/Downloads/jar_files/spring-tx-3.0.1.RELEASE.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

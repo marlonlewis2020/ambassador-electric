@@ -10,6 +10,9 @@ package app;
 import java.math.BigDecimal;  // for rounding floats
 import java.math.RoundingMode;
 
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
 import database.DatabasesDAO;
 import app.ManageNotifications;
 
@@ -19,19 +22,18 @@ public class InventoryItem implements ManageNotifications{
 	    private String id;
 
 	    private String itemName; 
-	    private String productCode;   //unique identifier for this type of product.
-
+	    private String productCode;
 	    private int totalQty = 0;
-	    // below is a dictionary item storing job reference numbers and quantities assigned
-	    static ArrayList<String> jobs = new ArrayList<String>();
-	    static int assignedQty = 0;
+	    private ArrayList<String> jobs = new ArrayList<String>();
+	    private int assignedQty = 0;
 	    private double unitCost = 0;
 	    static int pendingQty = 0;
 	    static int criticalLevel = 0;
 	    static String isCritical = "";
 	    private String supplier = "";
 	    private String manufacturer = "";
-	    private Notification notify = new Notification("owner", this.getItemName(), this.getTotalQty());
+	    private ApplicationContext ctx = new ClassPathXmlApplicationContext("applicationContext.xml");
+		private DatabasesDAO dao =(DatabasesDAO)ctx.getBean("dbdao");
 	   
 	    /**
 	     *	Creates an InventoryItem object with the specified order, quantity
@@ -47,58 +49,86 @@ public class InventoryItem implements ManageNotifications{
 	    public InventoryItem(String item_name, String product_code, int qty, double cost, 
 	    		int pendQty, String producer, String suppl)
 	    {
-	        idGen++ ;
-	        id = Integer.toString(idGen) ;
-	        
+	        id = Integer.toString(idGen++) ;
 	        itemName = item_name;
 	        productCode = product_code;
 	        totalQty = qty;
-
 	        BigDecimal roundedNum = new BigDecimal(cost).setScale(2, RoundingMode.HALF_UP);
 	        unitCost = roundedNum.doubleValue();
-
 	        pendingQty = pendQty;
 	        supplier = producer;
 	        manufacturer = suppl;
+	        criticalLevel = (int) (qty*0.5);
 	        isCritical = "Not_Critical";
-	        
-	        //DatabasesDAO data = new DatabasesDAO();
-
+	        jobs.add("n/a");
+//	        new DatabasesDAO().saveItem(this);
 	    }
 
 	    //constructor 2
+	    /**
+	     * method used when encapsulating an inventory item record from the database into the system for processing
+	     * @param id_num id for inventory item
+	     * @param item_name name of the inventory item
+	     * @param product_code product code for inventory item
+	     * @param cost the unit cost of item
+	     * @param pending_Qty quantity of the specified item unfulfilled (or being awaited)
+	     * @param total_Qty total quantity to be assigned
+	     * @param assigned_jobs open job numbers associated with the use of this item
+	     * @param assigned_Qty the quantity that is actively being used on open job
+	     * @param critical critical level for this item
+	     * @param is_critical critical status message for this item
+	     * @param supplier Supplier
+	     * @param manufacturer manufacturer
+	     */
 	    public InventoryItem(String id_num, String item_name, String product_code, double cost, 
-	    int pending_Qty, int total_Qty, String assigned_Data, int assigned_Qty, int critical, 
-	    String is_critical, String producer, String suppl)
+	    int pending_Qty, int total_Qty, String assigned_jobs, int assigned_Qty, int critical, 
+	    String is_critical, String supplier, String manufacturer)
 	    {
 	        id = id_num;
 	        itemName = item_name; 
 	        productCode = product_code;   
 	        totalQty = total_Qty;
-	        
-	        String[] arr = assigned_Data.split(",");
+	        //adding job numbers to the jobs arraylist
+	        String[] arr = assigned_jobs.split(",");
 	        for (String str: arr){
 	        	jobs.add(str);
 	        }
-	        
 	        assignedQty = assigned_Qty;
 	        unitCost = cost;
 	        pendingQty = pending_Qty;
-	        supplier = producer;
-	        manufacturer = suppl;
-	        criticalLevel = critical;
+	        this.supplier = supplier;
+	        this.manufacturer = manufacturer;
+	        setCriticalLevel(critical);
 	        isCritical = is_critical;
+	        evaluateCritical();   
+	    }
+	    
+	    /**
+	     * calculates the available quantity of this item available
+	     * @return value: int
+	     */
+	    private int getAvailableQty(){
+	    	return totalQty - assignedQty;
 	    }
 
-	    public void evaluateCritical()
+	    /**
+	     * checks the available balance against the critical level, updates critical level status
+	     * and creates critical level notification in database, if applicable
+	     */
+	    private void evaluateCritical()
 	    {
-	        if ( (totalQty - assignedQty) > criticalLevel)
-	        {
-	            isCritical = "Not_Critical" ;
-	        } else
-	        {
-	            isCritical = "Critical" ;
+	        if(checkCritical()){
+	    		//update isCritical Status
+	        	isCritical = "Critical";
+	        	//add notification
+	        	addNotification("owner");
 	        }
+	        else
+	        {
+	        	//update isCriticalStatus. i.e. 
+	        	isCritical = "Not_Critical";
+	        }
+	        dao.updateItem(this, "Critical Status", isCritical);
 	    }
 
 	    /**
@@ -106,14 +136,15 @@ public class InventoryItem implements ManageNotifications{
 	     *	@param qty - the amount of the item being received.
 	     *  @param cost - the cost of the item being received.
 	    **/
-	    public void receiveItem(int qty, double cost)
+	    public void receiveQty(int qty, double cost)
 	    {
 	        totalQty += qty ;
-	        unitCost = (unitCost + cost)/ 2 ;
-	        evaluateCritical() ;
-
-	        BigDecimal roundedNum = new BigDecimal(unitCost).setScale(2, RoundingMode.HALF_UP);
-	        unitCost = roundedNum.doubleValue();
+	        unitCost = new BigDecimal(
+	        		(unitCost + cost)/ 2).setScale(
+	        				2, RoundingMode.HALF_UP).doubleValue();
+	        evaluateCritical();
+	        dao.updateItem(this, "Total Quantity", String.valueOf(totalQty));
+	        dao.updateItem(this, "Critical Level", String.valueOf(unitCost));
 	    }
 
 	    /**
@@ -123,9 +154,13 @@ public class InventoryItem implements ManageNotifications{
 	    **/
 	    public void assign(String jobRefNum, int qty)
 	    {
-	        //jobs.put(jobRefNum, qty) ;
-	        assignedQty += qty ;
-	        evaluateCritical() ;
+	    	//when job is closed, the used assigned number for each item gets deducted from assignedQty
+	    	//totalQty can never be less than assignedQty
+	        this.jobs.add(jobRefNum);
+	        this.assignedQty += qty;
+	        evaluateCritical();
+	        dao.updateItem(this, "Jobs", getJobs());
+	        dao.updateItem(this, "Assigned Quantity", String.valueOf(assignedQty));
 	    }
 
 	    /**
@@ -211,19 +246,15 @@ public class InventoryItem implements ManageNotifications{
 	     *	Updates critical level of the inventory item using the specified integer.
 	     *	@param critLevel - an integer to be used to replace curent critical level.
 	    **/
-	    public void setCriticalLevel(int critLevel)
+	    private void setCriticalLevel(int critLevel)
 	    {
 	        criticalLevel = critLevel;
-	        checkCritical();
 	    }
 	    
 	    private boolean checkCritical(){
-	    	if (this.getCriticalLevel() >= this.getTotalQty()){
-	    		isCritical = "Critical";
-	        	this.addNotification("owner");
+	    	if (getCriticalLevel() >= getAvailableQty()){
 	        	return true;
 	        }
-	    	isCritical = "Not_Critical";
 	    	return false;
 	    }
 
@@ -283,6 +314,10 @@ public class InventoryItem implements ManageNotifications{
 	        return totalQty;
 	    }
 	    
+	    /**
+	     * gets the string of jobs
+	     * @return
+	     */
 	    public String getJobs(){
 	    	String myString = "";
 	    	for (String str: jobs){
@@ -333,15 +368,15 @@ public class InventoryItem implements ManageNotifications{
 		}
 
 		@Override
+		/**
+		 * adds inventory level notification to database if none exists
+		 */
 		public boolean addNotification(String username) {
 			// TODO Auto-generated method stub
-			DatabasesDAO data = new DatabasesDAO();
-			int saveNotif = data.saveNotification(notify);
-			if (saveNotif==1){
-				System.out.printf(" %s - true", saveNotif);
+			if(dao.saveNotification(new Notification
+					("owner", this.getItemName(), this.getTotalQty())) == 1){
 				return true;
 			}
-			System.out.printf(" %s - false", saveNotif);
 			return false;
 		}
 
@@ -373,7 +408,7 @@ public class InventoryItem implements ManageNotifications{
 		public ArrayList<Notification> pullNotifications(String type) {
 			// TODO Auto-generated method stub
 			ArrayList<Notification> arr = new ArrayList<Notification>();
-			List<Notification> list = new DatabasesDAO().allNotifications();
+			List<Notification> list = dao.allNotifications();
 			for (Notification n: list){
 				arr.add(n);
 			}
