@@ -10,7 +10,7 @@ import java.util.ArrayList;
 public interface ManageNotifications {
 	static ArrayList<Notification> alerts = new ArrayList<Notification>();
 
-	abstract boolean addNotification();
+	abstract boolean addNotification(String username);
 	/*
 	 * adds notification to database
 	 */
@@ -60,7 +60,5 @@ public interface ManageNotifications {
 	/*
 	 * returns an ArrayList of all notification objects in the database
 	 */
-	
-	//url = jdbc:oracle:thin:@localhost:3306:xe
 
 }

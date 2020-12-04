@@ -2,5 +2,14 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8"/>
+	<classpathentry kind="lib" path="C:/Users/Marlon Lewis/Downloads/spcorejars/spcorejars/org.springframework.core-3.0.1.RELEASE-A.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Marlon Lewis/Downloads/springjars/springjars/persistCore/persistCore/org.springframework.jdbc-3.0.1.RELEASE-A.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Marlon Lewis/Downloads/spring-dao-2.0.6.jar/spring-dao-2.0.6.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Marlon Lewis/Downloads/org.springframework.beans-sources-3.0.4.release.jar/org.springframework.beans-sources-3.0.4.RELEASE.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Marlon Lewis/Downloads/springjars/springjars/core/core/org.springframework.context-3.0.1.RELEASE-A.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Marlon Lewis/Downloads/springjars/springjars/core/core/org.springframework.beans-3.0.1.RELEASE-A.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Marlon Lewis/Downloads/commons-logging-1.1.2.jar/commons-logging-1.1.2.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Marlon Lewis/Downloads/org.springframework.asm-3.0.1.release.jar/org.springframework.asm-3.0.1.RELEASE.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Marlon Lewis/Downloads/springjars/springjars/core/core/org.springframework.expression-3.0.1.RELEASE-A.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -1,5 +1,9 @@
 package app;
 
+import database.DatabasesDAO;
+import org.springframework.context.ApplicationContext;  
+import org.springframework.context.support.ClassPathXmlApplicationContext; 
+
 /**
  * @author Marlon Lewis
  * @version 1.0
@@ -16,6 +20,16 @@ public class Notification {
 	private String job;
 	private String inv;
 	private int inv_level = 0;
+	
+	public Notification(String type, String user, String id, String message, String job, String item, int item_level){
+		this.type = type;
+		this.user = user;
+		this.id = id;
+		notificationInfo = message;
+		this.job = job;
+		inv = item;
+		inv_level = item_level;
+	}
 	
 	public Notification(String username, String type, String job_number) {
 		this.type = type;
@@ -77,33 +91,39 @@ public class Notification {
 		return this.notificationInfo;
 	}
 	
-//	public static void main(String[] args) {
-//		// TODO Auto-generated method stub
-//		
-//		Notification xxx = new Notification("marlon", "laptop", 6);
-//		System.out.println(xxx.getUser());
-//		System.out.println(xxx.getId());
-//		System.out.println(xxx.getType());
-//		System.out.println(xxx.alert());
-//		
-//		Notification yyy = new Notification("lewis", "phone", 2);
-//		System.out.println(yyy.getUser());
-//		System.out.println(yyy.getId());
-//		System.out.println(yyy.getType());
-//		System.out.println(yyy.alert());
-//		
-//		Notification aaa = new Notification("mlewis", "job", "JB101");
-//		System.out.println(aaa.getUser());
-//		System.out.println(aaa.getId());
-//		System.out.println(aaa.getType());
-//		System.out.println(aaa.alert());	
-//		
-//		Notification bbb = new Notification("user", "job", "JB102");
-//		System.out.println(bbb.getUser());
-//		System.out.println(bbb.getId());
-//		System.out.println(bbb.getType());
-//		System.out.println(bbb.alert());	
-//
-//	}
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		ApplicationContext ctx = new ClassPathXmlApplicationContext("applicationContext.xml");
+		
+		DatabasesDAO dao =(DatabasesDAO)ctx.getBean("dbdao"); 
+		
+		Notification xxx = new Notification("marlon", "laptop", 6);
+		System.out.println(xxx.getUser());
+		System.out.println(xxx.getId());
+		System.out.println(xxx.getType());
+		System.out.println(xxx.alert());
+		
+		Notification yyy = new Notification("lewis", "phone", 2);
+		System.out.println(yyy.getUser());
+		System.out.println(yyy.getId());
+		System.out.println(yyy.getType());
+		System.out.println(yyy.alert());
+		
+		Notification aaa = new Notification("mlewis", "job", "JB101");
+		System.out.println(aaa.getUser());
+		System.out.println(aaa.getId());
+		System.out.println(aaa.getType());
+		System.out.println(aaa.alert());	
+		
+		Notification bbb = new Notification("user", "job", "JB102");
+		System.out.println(bbb.getUser());
+		System.out.println(bbb.getId());
+		System.out.println(bbb.getType());
+		System.out.println(bbb.alert());	
+		int status = dao.saveNotification(xxx);
+		
+		System.out.println(status);
+
+	}
 
 }
