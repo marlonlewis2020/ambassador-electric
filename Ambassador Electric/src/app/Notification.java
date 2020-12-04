@@ -93,36 +93,46 @@ public class Notification {
 	
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-		ApplicationContext ctx = new ClassPathXmlApplicationContext("applicationContext.xml");
+		try{
+			ApplicationContext ctx = new ClassPathXmlApplicationContext("applicationContext.xml");
+			
+			DatabasesDAO dao =(DatabasesDAO)ctx.getBean("dbdao"); 
+			
+			Notification xxx = new Notification("marlon", "laptop", 6);
+			System.out.println(xxx.getUser());
+			System.out.println(xxx.getId());
+			System.out.println(xxx.getType());
+			System.out.println(xxx.alert());
+			
+			Notification yyy = new Notification("lewis", "phone", 2);
+			System.out.println(yyy.getUser());
+			System.out.println(yyy.getId());
+			System.out.println(yyy.getType());
+			System.out.println(yyy.alert());
+			
+			Notification aaa = new Notification("mlewis", "job", "JB101");
+			System.out.println(aaa.getUser());
+			System.out.println(aaa.getId());
+			System.out.println(aaa.getType());
+			System.out.println(aaa.alert());	
+			
+			Notification bbb = new Notification("user", "job", "JB102");
+			System.out.println(bbb.getUser());
+			System.out.println(bbb.getId());
+			System.out.println(bbb.getType());
+			System.out.println(bbb.alert());	
+			int status = dao.saveNotification(xxx);
+			
+			System.out.println(status);
+		}
+		catch(Exception e){
+			e.printStackTrace();
+			for (String s: e.getMessage().split(":")){
+				System.out.println(s+":");
+			}
+			
+		}
 		
-		DatabasesDAO dao =(DatabasesDAO)ctx.getBean("dbdao"); 
-		
-		Notification xxx = new Notification("marlon", "laptop", 6);
-		System.out.println(xxx.getUser());
-		System.out.println(xxx.getId());
-		System.out.println(xxx.getType());
-		System.out.println(xxx.alert());
-		
-		Notification yyy = new Notification("lewis", "phone", 2);
-		System.out.println(yyy.getUser());
-		System.out.println(yyy.getId());
-		System.out.println(yyy.getType());
-		System.out.println(yyy.alert());
-		
-		Notification aaa = new Notification("mlewis", "job", "JB101");
-		System.out.println(aaa.getUser());
-		System.out.println(aaa.getId());
-		System.out.println(aaa.getType());
-		System.out.println(aaa.alert());	
-		
-		Notification bbb = new Notification("user", "job", "JB102");
-		System.out.println(bbb.getUser());
-		System.out.println(bbb.getId());
-		System.out.println(bbb.getType());
-		System.out.println(bbb.alert());	
-		int status = dao.saveNotification(xxx);
-		
-		System.out.println(status);
 
 	}
 
